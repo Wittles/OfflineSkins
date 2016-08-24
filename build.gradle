@@ -12,7 +12,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.10.2-v1a"
+version = "1.10.3"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
@@ -24,32 +24,32 @@ minecraft {
 }
 
 jar
-{
-    manifest {
-        attributes 'FMLCorePlugin': 'lain.mods.skins.asm.Plugin',
-		           'FMLCorePluginContainsFMLMod': 'true'
-    }
-}
+        {
+            manifest {
+                attributes 'FMLCorePlugin': 'lain.mods.skins.asm.Plugin',
+                        'FMLCorePluginContainsFMLMod': 'true'
+            }
+        }
 
 processResources
-{
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+        {
+            inputs.property "version", project.version
+            inputs.property "mcversion", project.minecraft.version
 
-    from 'LICENSE.txt'
+            from 'LICENSE.txt'
 
-    from(sourceSets.main.resources.srcDirs)
-    {
-        include 'mcmod.info'
+            from(sourceSets.main.resources.srcDirs)
+                    {
+                        include 'mcmod.info'
 
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
+                        expand 'version':project.version, 'mcversion':project.minecraft.version
+                    }
 
-    from(sourceSets.main.resources.srcDirs)
-    {
-        exclude 'mcmod.info'
-    }
-}
+            from(sourceSets.main.resources.srcDirs)
+                    {
+                        exclude 'mcmod.info'
+                    }
+        }
 
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'

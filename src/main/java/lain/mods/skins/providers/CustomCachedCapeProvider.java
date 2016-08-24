@@ -9,7 +9,6 @@ import java.net.Proxy;
 import java.net.URL;
 import java.util.UUID;
 import javax.imageio.ImageIO;
-import lain.mods.skins.LegacyConversion;
 import lain.mods.skins.PlayerUtils;
 import lain.mods.skins.SkinData;
 import lain.mods.skins.api.ISkin;
@@ -20,20 +19,22 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import com.google.common.base.Strings;
 
-public class CrafatarCachedSkinProvider implements ISkinProvider
+public class CustomCachedCapeProvider implements ISkinProvider
 {
 
     private File _workDir;
+    private String CustomHostAddress;
 
-    public CrafatarCachedSkinProvider()
+    public CustomCachedCapeProvider(String host)
     {
         File file1 = new File(Minecraft.getMinecraft().mcDataDir, "cachedImages");
         if (!file1.exists())
             file1.mkdirs();
-        File file2 = new File(file1, "crafatar");
+        File file2 = new File(file1, host.replaceAll("[:/ .]","").toLowerCase());
         if (!file2.exists())
             file2.mkdirs();
-        prepareWorkDir(_workDir = new File(file2, "skins"));
+        prepareWorkDir(_workDir = new File(file2, "capes"));
+        CustomHostAddress = host;
     }
 
     @Override
@@ -58,7 +59,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
                     for (int n = 0; n < 5; n++)
                         try
                         {
-                            if ((image = readImageCached(_workDir, uuid.toString(), new URL(String.format("https://crafatar.com/skins/%s", uuid)), Minecraft.getMinecraft().getProxy())) != null)
+                            if ((image = readImageCached(_workDir, uuid.toString(), new URL(String.format("%1$s/capes/%2$s",CustomHostAddress, uuid)), Minecraft.getMinecraft().getProxy())) != null)
                                 break;
                         }
                         catch (IOException e)
@@ -70,7 +71,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
                     for (int n = 0; n < 5; n++)
                         try
                         {
-                            if ((image = readImageCached(_workDir, name, new URL(String.format("https://crafatar.com/skins/%s", name)), Minecraft.getMinecraft().getProxy())) != null)
+                            if ((image = readImageCached(_workDir, name, new URL(String.format("%1$s/capes/%2$s",CustomHostAddress, name)), Minecraft.getMinecraft().getProxy())) != null)
                                 break;
                         }
                         catch (IOException e)
@@ -80,11 +81,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
 
                 if (image != null && image != Shared.dummy)
                 {
-                    String type = SkinData.judgeSkinType(image);
-                    if ("legacy".equals(type))
-                        type = "default";
-                    image = new LegacyConversion().convert(image);
-                    data.put(image, type);
+                    data.put(image, "cape");
                 }
             }
 

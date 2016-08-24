@@ -3,12 +3,7 @@ package lain.mods.skins;
 import lain.mods.skins.api.ISkin;
 import lain.mods.skins.api.ISkinProviderService;
 import lain.mods.skins.api.SkinProviderAPI;
-import lain.mods.skins.providers.CrafatarCachedCapeProvider;
-import lain.mods.skins.providers.CrafatarCachedSkinProvider;
-import lain.mods.skins.providers.MojangCachedCapeProvider;
-import lain.mods.skins.providers.MojangCachedSkinProvider;
-import lain.mods.skins.providers.UserManagedCapeProvider;
-import lain.mods.skins.providers.UserManagedSkinProvider;
+import lain.mods.skins.providers.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -119,21 +114,24 @@ public class OfflineSkins
         if (event.getSide().isClient())
         {
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-            boolean useCrafatar = config.get(Configuration.CATEGORY_CLIENT, "useCrafatar", true).getBoolean(true);
+
+            boolean useCustomProvider = config.get(Configuration.CATEGORY_CLIENT, "useCustomProvider", true).getBoolean(true);
+            String customProvider = config.get(Configuration.CATEGORY_CLIENT, "CustomProvider", "https://crafatar.com", "[default: https://crafatar.com]").getString();
+
             if (config.hasChanged())
                 config.save();
 
-            skinService = SkinProviderAPI.createService();
             capeService = SkinProviderAPI.createService();
-
+            skinService = SkinProviderAPI.createService();
+            if (useCustomProvider)
+                skinService.register(new CustomCachedSkinProvider(customProvider));
             skinService.register(new MojangCachedSkinProvider());
             skinService.register(new UserManagedSkinProvider());
-            if (useCrafatar)
-                skinService.register(new CrafatarCachedSkinProvider());
+
+            if (useCustomProvider)
+                capeService.register(new CustomCachedCapeProvider(customProvider));
             capeService.register(new MojangCachedCapeProvider());
             capeService.register(new UserManagedCapeProvider());
-            if (useCrafatar)
-                capeService.register(new CrafatarCachedCapeProvider());
 
             MinecraftForge.EVENT_BUS.register(this);
         }
